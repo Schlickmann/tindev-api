@@ -19,7 +19,7 @@ module.exports = {
   },
 
   async store(req, res) {
-    const { username } = req.body;
+    let { username } = req.body;
     username = username.toLowerCase();
 
     const devExists = await Developer.findOne({ user: username });

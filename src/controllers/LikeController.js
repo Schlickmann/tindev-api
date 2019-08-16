@@ -1,4 +1,5 @@
 const Developer = require("../models/Developers");
+const Connection = require("../models/Connections");
 
 module.exports = {
   async store(req, res) {
@@ -14,7 +15,20 @@ module.exports = {
     }
 
     if (targetDev.likes.includes(loggedDev._id)) {
-      console.log("Match");
+      const loggedSocket = await Connection.findOne({
+        developer_id: loggedDev._id
+      });
+      const targetSocket = await Connection.findOne({
+        developer_id: targetDev._id
+      });
+
+      if (loggedSocket) {
+        req.io.to(loggedSocket.socket_id).emit("match", targetDev);
+      }
+
+      if (targetSocket) {
+        req.io.to(targetSocket.socket_id).emit("match", loggedDev);
+      }
     }
 
     loggedDev.likes.push(targetDev._id);
